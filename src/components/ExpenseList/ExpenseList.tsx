@@ -1,20 +1,13 @@
 // src/components/ExpenseList/ExpenseList.tsx
 import React, { useState } from 'react';
 import ExpenseCard from '../ExpenseCard/ExpenseCard';
-import type { ExpenseCardProps } from '../ExpenseCard/ExpenseCard';
+import type { ExpenseCardProps, FilterOption, SortOption } from '../ExpenseCard/ExpenseCard';
+import type { Expense } from '../../App';
 import './ExpenseList.css';
 
-// Type for expense data (reusing interface from ExpenseCard)
-type Expense = ExpenseCardProps;
-
-/**
- * Props interface for ExpenseList component
- * FIXED: expenses is now required (not optional initialExpenses)
- * @interface ExpenseListProps
- * @property {Expense[]} expenses - Current expense data from parent component (App.tsx)
- */
 interface ExpenseListProps {
-  expenses: Expense[];  // FIXED: Required prop, receives current state from App
+  expenses: Expense[];
+  onDelete?: (id: string) => void;  // id is now string
 }
 
 /**
@@ -32,10 +25,10 @@ interface ExpenseListProps {
  * @param {ExpenseListProps} props - Component props
  * @returns {JSX.Element} Rendered expense list with filtering controls
  */
-const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
+const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onDelete }) => {
   
   // ONLY manage UI state (filtering) - NOT expense data
-  const [filterCategory, setFilterCategory] = useState<string>('All');
+  const [filterCategory, setFilterCategory] = useState<FilterOption>('All');
 
   // Filter expenses from props (not local state)
   const filteredExpenses = filterCategory === 'All' 
@@ -53,8 +46,24 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
    * @param {React.ChangeEvent<HTMLSelectElement>} event - Select change event
    */
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilterCategory(event.target.value);
+    setFilterCategory(event.target.value as FilterOption);
   };
+
+  const [sortOption, setSortOption] = useState<SortOption>('date');
+
+  const sortedExpenses = [...filteredExpenses].sort((a, b) => {
+    switch (sortOption) {
+      case 'date':
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      case 'amount':
+        return a.amount - b.amount;
+      case 'category':
+        return a.category.localeCompare(b.category);
+      default:
+        return 0;
+    }
+  });
+
 
   return (
     <div className="expense-list">
@@ -78,6 +87,19 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
         </div>
       </div>
 
+      <div className="sort-controls">
+        <label htmlFor="sort-select">Sort by:</label>
+        <select
+          id="sort-select"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value as SortOption)}
+        >
+          <option value="date">Date</option>
+          <option value="amount">Amount</option>
+          <option value="category">Category</option>
+        </select>
+      </div>
+
       <div className="expense-summary">
         <p>
           Total: ${filteredTotal.toFixed(2)} ({filteredExpenses.length} expenses)
@@ -90,10 +112,11 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses }) => {
             No expenses found. Add some expenses to get started!
           </p>
         ) : (
-          filteredExpenses.map(expense => (
+          sortedExpenses.map(expense => (
             <ExpenseCard
               key={expense.id}
               {...expense}
+              onDelete={onDelete}
             />
           ))
         )}

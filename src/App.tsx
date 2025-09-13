@@ -4,15 +4,19 @@ import Header from './components/Header/Header';
 import ExpenseSummary from './components/ExpenseSummary/ExpenseSummary';
 import ExpenseList from './components/ExpenseList/ExpenseList';
 import ExpenseForm from './components/ExpenseForm/ExpenseForm';
+import type { ExpenseCategory } from './components/ExpenseCard/ExpenseCard';
 import './App.css';
 
 // Type for expense data
-interface Expense {
-  id: number;
+export interface Expense {
+  id: string;                    // Professional: UUIDs are strings
   description: string;
   amount: number;
-  category: string;
-  date: string;
+  category: ExpenseCategory;     // Your union type
+  date: string;                 // ISO date string
+  createdAt?: string;           // Optional metadata
+  updatedAt?: string;           // Professional tracking
+  tags?: string[];              // Optional future features
 }
 
 /**
@@ -23,18 +27,20 @@ function App() {
   // Application state for expense data - this is the only place expenses are stored
   const [expenses, setExpenses] = useState<Expense[]>([
     {
-      id: 1,
+      id: Date.now().toString(),
       description: "Lunch at downtown cafe",
       amount: 12.50,
       category: "Food",
-      date: "2024-01-15"
+      date: "2024-01-15",
+      createdAt: new Date().toISOString()
     },
     {
-      id: 2,
+      id: Date.now().toString(),
       description: "Monthly bus pass",
       amount: 95.00,
-      category: "Transportation", 
-      date: "2024-01-14"
+      category: "Transportation",
+      date: "2024-01-14",
+      createdAt: new Date().toISOString()
     }
   ]);
 
@@ -46,7 +52,10 @@ function App() {
   const handleAddExpense = (expenseData: Omit<Expense, 'id'>): void => {
     const newExpense: Expense = {
       ...expenseData,
-      id: Date.now()
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: undefined,               
+      tags: [],
     };
     setExpenses(prev => [...prev, newExpense]);
   };
@@ -71,7 +80,10 @@ function App() {
           <ExpenseForm onSubmit={handleAddExpense} />
           
           {/* FIXED: Pass expenses directly, not as initialExpenses */}
-          <ExpenseList expenses={expenses} />
+          <ExpenseList 
+            expenses={expenses} 
+            onDelete={(id) => setExpenses(prev => prev.filter(e => e.id !== id))}
+          />
         </main>
       </div>
     </div>

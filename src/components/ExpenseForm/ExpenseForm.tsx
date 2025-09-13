@@ -1,13 +1,21 @@
 // src/components/ExpenseForm/ExpenseForm.tsx
 import React, { useState } from 'react';
+import type { ExpenseCategory } from '../ExpenseCard/ExpenseCard';
 import './ExpenseForm.css';
 
 // Form data interface
 interface ExpenseFormData {
   description: string;
   amount: string;
-  category: string;
+  category: ExpenseCategory;
   date: string;
+}
+
+interface FormErrors {
+  description?: string;
+  amount?: string;
+  category?: string;
+  date?: string;
 }
 
 /**
@@ -19,7 +27,7 @@ interface ExpenseFormProps {
   onSubmit: (expenseData: {
     description: string;
     amount: number;
-    category: string;
+    category: ExpenseCategory;
     date: string;
   }) => void;
 }
@@ -47,6 +55,24 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit }) => {
     }));
   };
 
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const validateForm = (data: ExpenseFormData): FormErrors => {
+    const errors: FormErrors = {};
+
+    if (!data.description.trim()) errors.description = "Description is required";
+    
+    const amount = parseFloat(data.amount);
+    if (!data.amount) errors.amount = "Amount is required";
+    else if (isNaN(amount) || amount <= 0) errors.amount = "Amount must be greater than 0";
+
+    if (!data.category) errors.category = "Category is required";
+
+    if (!data.date) errors.date = "Date is required";
+
+    return errors;
+  };
+
   /**
    * Handles form submission with validation and data processing
    * @param {React.FormEvent<HTMLFormElement>} e - Form submission event
@@ -57,6 +83,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit }) => {
     // Basic validation
     if (!formData.description.trim() || !formData.amount || !formData.date) {
       alert('Please fill in all required fields');
+      return;
+    }
+
+    const validationErrors = validateForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors); // show errors
       return;
     }
 
@@ -81,6 +113,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit }) => {
       category: 'Food',
       date: new Date().toISOString().split('T')[0]
     });
+
+    setErrors({});
   };
 
   return (
@@ -98,6 +132,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit }) => {
           placeholder="What did you spend money on?"
           required
         />
+        {errors.description && <p className="error-text">{errors.description}</p>}
       </div>
 
       <div className="form-row">
@@ -114,6 +149,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit }) => {
             min="0"
             required
           />
+          {errors.amount && <p className="error-text">{errors.amount}</p>}
         </div>
 
         <div className="form-group">
@@ -130,6 +166,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit }) => {
             <option value="Shopping">Shopping</option>
             <option value="Other">Other</option>
           </select>
+          {errors.category && <p className="error-text">{errors.category}</p>}
         </div>
       </div>
 
@@ -143,6 +180,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit }) => {
           onChange={handleInputChange}
           required
         />
+        {errors.date && <p className="error-text">{errors.date}</p>}
       </div>
 
       <button type="submit" className="submit-button">

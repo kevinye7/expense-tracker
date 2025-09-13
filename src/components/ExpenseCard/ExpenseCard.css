@@ -49,3 +49,24 @@
   font-weight: bold;
   color: #059669;
 }
+
+.expense-card.highlighted {
+  background-color: #f0f8ff; 
+}
+
+/* Minimal delete button */
+.expense-delete-btn {
+  padding: 4px 10px;
+  background-color: #ddd;     
+  color: #333;                
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.expense-delete-btn:hover {
+  background-color: #bbb;       
+  color: #000;
+}

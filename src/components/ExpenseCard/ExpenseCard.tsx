@@ -4,7 +4,6 @@ import './ExpenseCard.css';
 
 export type ExpenseCategory = 'Food' | 'Transportation' | 'Entertainment' | 'Shopping' | 'Other';
 export type SortOption = 'date' | 'amount' | 'category';
-export type FilterOption = 'All' | ExpenseCategory;
 
 // TypeScript interface defines the structure of props this component expects
 // This acts like a contract - any parent component must provide these exact properties

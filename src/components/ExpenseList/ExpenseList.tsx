@@ -1,14 +1,16 @@
 // src/components/ExpenseList/ExpenseList.tsx
 import React, { useState } from 'react';
 import ExpenseCard from '../ExpenseCard/ExpenseCard';
-import type { ExpenseCardProps, FilterOption, SortOption } from '../ExpenseCard/ExpenseCard';
+import type { SortOption, ExpenseCategory } from '../ExpenseCard/ExpenseCard';
 import type { Expense } from '../../App';
 import './ExpenseList.css';
 
 interface ExpenseListProps {
   expenses: Expense[];
-  onDelete?: (id: string) => void;  // id is now string
+  onDelete?: (id: string) => void; 
 }
+
+type FilterOption = 'All' | ExpenseCategory;
 
 /**
  * ExpenseList Component - FIXED VERSION
@@ -82,6 +84,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onDelete }) => {
             <option value="Food">Food</option>
             <option value="Transportation">Transportation</option>
             <option value="Entertainment">Entertainment</option>
+            <option value="Shopping">Shopping</option>
             <option value="Other">Other</option>
           </select>
         </div>

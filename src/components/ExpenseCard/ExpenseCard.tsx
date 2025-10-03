@@ -1,23 +1,18 @@
 // src/components/ExpenseCard/ExpenseCard.tsx
 import React from 'react';
-import './ExpenseCard.css';
 
 export type ExpenseCategory = 'Food' | 'Transportation' | 'Entertainment' | 'Shopping' | 'Other';
 export type SortOption = 'date' | 'amount' | 'category';
 
-// TypeScript interface defines the structure of props this component expects
-// This acts like a contract - any parent component must provide these exact properties
 export interface ExpenseCardProps {
-  id: string;              // Unique identifier for each expense
-  description: string;     // What the expense was for (e.g., "Lunch at Joe's Pizza")
-  amount: number;         // Cost in dollars (will be formatted to show currency)
-  category: ExpenseCategory;       // Type of expense (e.g., "Food", "Transportation")
-  date: string;          // When the expense occurred (formatted as string)
-
-  // Optional props (can be provided or not)
-  onDelete?: (id: string) => void;    // The ? makes it optional
-  highlighted?: boolean;              // Component might be highlighted
-  showCategory?: boolean;             // Category display might be hidden
+  id: string;
+  description: string;
+  amount: number;
+  category: ExpenseCategory;
+  date: string;
+  onDelete?: (id: string) => void;
+  highlighted?: boolean;
+  showCategory?: boolean;
 }
 
 /**
@@ -35,18 +30,15 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
   amount, 
   category, 
   date,
-  // Optional props with default values
-  highlighted = false,      // Default to false if not provided
-  showCategory = true,      // Default to true if not provided
-  onDelete                  // Might be undefined
+  highlighted = false,
+  showCategory = true,
+  onDelete
 }) => {
-  // Format currency for professional display
   const formattedAmount = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD'
   }).format(amount);
 
-  // Format date for user-friendly display
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -54,22 +46,31 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
   });
 
   return (
-    <article className={`expense-card ${highlighted ? 'highlighted' : ''}`}>
-      <div className="expense-header">
-        {showCategory && <span className="expense-category">{category}</span>}
-        <time className="expense-date" dateTime={date}>
+    <article className={`
+      bg-white rounded-lg p-4 mb-3 shadow-md
+      transition-all duration-200 border-l-4
+      hover:translate-y-[-2px] hover:shadow-lg
+      ${highlighted ? 'bg-purple-70 border-l-purple-700' : 'border-l-purple-700'}
+    `}>
+      <div className="flex justify-between items-center mb-2">
+        {showCategory && (
+          <span className="bg-purple-700 text-white px-2 py-1 rounded text-xs font-semibold uppercase">
+            {category}
+          </span>
+        )}
+        <time className="text-gray-500 text-sm" dateTime={date}>
           {formattedDate}
         </time>
       </div>
       
-      <div className="expense-body">
-        <h3 className="expense-description">{description}</h3>
-        <p className="expense-amount">{formattedAmount}</p>
+      <div className="space-y-2">
+        <h3 className="text-gray-900 text-base font-medium mb-2">{description}</h3>
+        <p className="text-green-600 text-lg font-bold">{formattedAmount}</p>
       </div>
 
       {onDelete && (
         <button 
-          className="expense-delete-btn" 
+          className="bg-gray-300 text-gray-800 px-2.5 py-1 rounded-md border-0 cursor-pointer text-sm transition-colors duration-200 hover:bg-gray-400 hover:text-black mt-2"
           onClick={() => onDelete(id)}
         >
           Delete

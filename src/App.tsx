@@ -1,11 +1,10 @@
 // src/App.tsx - Updated with centralized state management
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Header from './components/Header/Header';
 import ExpenseSummary from './components/ExpenseSummary/ExpenseSummary';
 import ExpenseList from './components/ExpenseList/ExpenseList';
 import ExpenseForm from './components/ExpenseForm/ExpenseForm';
 import type { ExpenseCategory } from './components/ExpenseCard/ExpenseCard';
-import './App.css';
 
 // Type for expense data
 export interface Expense {
@@ -63,14 +62,14 @@ function App() {
   const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
   return (
-    <div className="App">
-      <div className="app-container">
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-6xl mx-auto p-5">
         <Header 
           title="Expense Tracker" 
           subtitle="Manage your spending with confidence" 
         />
         
-        <main className="app-main">
+        <main className="space-y-8">
           <ExpenseSummary 
             totalAmount={totalAmount}
             expenseCount={expenses.length}

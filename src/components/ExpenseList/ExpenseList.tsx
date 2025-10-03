@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import ExpenseCard from '../ExpenseCard/ExpenseCard';
 import type { SortOption, ExpenseCategory } from '../ExpenseCard/ExpenseCard';
 import type { Expense } from '../../App';
-import './ExpenseList.css';
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -66,54 +65,70 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onDelete }) => {
     }
   });
 
-
   return (
-    <div className="expense-list">
-      <div className="expense-controls">
-        <h2>Your Expenses</h2>
+    <div className="bg-white rounded-lg p-6 mb-8 shadow-sm border border-gray-200">
+      {/* Header and Controls */}
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 m-0">Your Expenses</h2>
         
-        <div className="filter-controls">
-          <label htmlFor="category-filter">Filter by category:</label>
-          <select 
-            id="category-filter"
-            value={filterCategory}
-            onChange={handleCategoryChange}
-            className="category-select"
-          >
-            <option value="All">All Categories</option>
-            <option value="Food">Food</option>
-            <option value="Transportation">Transportation</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Shopping">Shopping</option>
-            <option value="Other">Other</option>
-          </select>
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Filter Controls */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="category-filter" className="text-sm font-medium text-gray-700">
+              Filter by category:
+            </label>
+            <select 
+              id="category-filter"
+              value={filterCategory}
+              onChange={handleCategoryChange}
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-700 cursor-pointer transition-colors duration-200 hover:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-700 focus:border-transparent"
+            >
+              <option value="All">All Categories</option>
+              <option value="Food">Food</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          {/* Sort Controls */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="sort-select" className="text-sm font-medium text-gray-700">
+              Sort by:
+            </label>
+            <select
+              id="sort-select"
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as SortOption)}
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-700 cursor-pointer transition-colors duration-200 hover:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-700 focus:border-transparent"
+            >
+              <option value="date">Date</option>
+              <option value="amount">Amount</option>
+              <option value="category">Category</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="sort-controls">
-        <label htmlFor="sort-select">Sort by:</label>
-        <select
-          id="sort-select"
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value as SortOption)}
-        >
-          <option value="date">Date</option>
-          <option value="amount">Amount</option>
-          <option value="category">Category</option>
-        </select>
-      </div>
-
-      <div className="expense-summary">
-        <p>
+      {/* Summary Section */}
+      <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+        <p className="text-lg font-semibold text-purple-800 m-0">
           Total: ${filteredTotal.toFixed(2)} ({filteredExpenses.length} expenses)
         </p>
       </div>
 
-      <div className="expense-items">
-        {filteredExpenses.length === 0 ? (
-          <p className="no-expenses">
-            No expenses found. Add some expenses to get started!
-          </p>
+      {/* Expense Items */}
+      <div className="space-y-3">
+        {sortedExpenses.length === 0 ? (
+          <div className="text-center py-10 px-5 text-gray-500">
+            <p className="text-base m-0">
+              {expenses.length === 0 
+                ? "No expenses found. Add some expenses to get started!"
+                : "No expenses match your current filter."
+              }
+            </p>
+          </div>
         ) : (
           sortedExpenses.map(expense => (
             <ExpenseCard

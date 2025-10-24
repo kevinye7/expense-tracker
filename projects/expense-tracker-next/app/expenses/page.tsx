@@ -1,9 +1,11 @@
-// app/expenses/page.tsx
-'use client'  // Need 'use client' because page uses useState
+'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
-import ExpenseCard from '@/components/ExpenseCard/ExpenseCard'
+import Header from '@/components/Header/Header'
+import ExpenseSummary from '@/components/ExpenseSummary/ExpenseSummary'
+import ExpenseForm from '@/components/ExpenseForm/ExpenseForm'
+import ExpenseList from '@/components/ExpenseList/ExpenseList'
 import type { ExpenseCategory } from '@/components/ExpenseCard/ExpenseCard';
 
 interface Expense {
@@ -12,87 +14,78 @@ interface Expense {
   amount: number;
   category: ExpenseCategory;
   date: string;
+  receiptUrl?: string;
 }
 
 export default function ExpensesPage() {
-    // State management - SAME as Vite!
-    const [expenses, setExpenses] = useState<Expense[]>([
-        {
-        id: 1,
-        description: "Lunch at downtown cafe",
-        amount: 12.50,
-        category: "Food",
-        date: "2024-01-15"
-        },
-        {
-        id: 2,
-        description: "Monthly bus pass",
-        amount: 95.00,
-        category: "Transportation", 
-        date: "2024-01-14"
-        },
-        {
-        id: 3,
-        description: "Movie tickets",
-        amount: 25.00,
-        category: "Entertainment", 
-        date: "2024-01-13"
-        }
-    ]);
+  const [expenses, setExpenses] = useState<Expense[]>([
+    {
+      id: 1,
+      description: "Lunch at downtown cafe",
+      amount: 12.50,
+      category: "Food",
+      date: "2024-01-15"
+    },
+    {
+      id: 2,
+      description: "Monthly bus pass",
+      amount: 95.00,
+      category: "Transportation", 
+      date: "2024-01-14"
+    },
+    {
+      id: 3,
+      description: "Movie tickets",
+      amount: 25.00,
+      category: "Entertainment", 
+      date: "2024-01-13"
+    }
+  ]);
 
-    const handleAddExpense = (expenseData: Omit<Expense, 'id'>): void => {
-        const newExpense: Expense = {
-        ...expenseData,
-        id: Date.now()
-        };
-        setExpenses(prev => [...prev, newExpense]);
+  const handleAddExpense = (expenseData: Omit<Expense, 'id'>): void => {
+    const newExpense: Expense = {
+      ...expenseData,
+      id: Date.now()
     };
+    setExpenses(prev => [...prev, newExpense]);
+  };
 
-    const handleDeleteExpense = (id: number): void => {
-        setExpenses(prev => prev.filter(expense => expense.id !== id));
-    };
+  const handleDeleteExpense = (id: number): void => {
+    setExpenses(prev => prev.filter(expense => expense.id !== id));
+  };
 
-    const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
   return (
-    <div className="min-h-screen p-8 bg-gray-50">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Expenses</h1>
-
-          {/* Summary Card */}
-          <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
-            <p className="text-gray-700">
-              Total: <span className="text-2xl font-bold text-green-600">
-                ${totalAmount.toFixed(2)}
-              </span>
-              <span className="text-sm text-gray-500 ml-2">
-                ({expenses.length} expenses)
-              </span>
-            </p>
-          </div>
-                
-          {/* Expense Cards */}
-          <div className="space-y-3">
-            {expenses.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">
-                No expenses yet. Add some expenses to get started!
-              </p>
-            ) : (
-              expenses.map(expense => (
-                <ExpenseCard
-                  key={expense.id}
-                  {...expense}
-                  onDelete={handleDeleteExpense}
-                  highlighted={expense.amount > 50}
-                />
-              ))
-            )}
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto p-5">
+        <Header 
+          title="Expense Tracker" 
+          subtitle="Manage your spending with confidence" 
+        />
         
-        <Link href="/" className="inline-block mt-4 text-blue-500 hover:underline">
-          ← Back to Home
-        </Link>
+        <main className="space-y-6">
+          <ExpenseSummary 
+            totalAmount={totalAmount}
+            expenseCount={expenses.length}
+            period="This Month"
+          />
+          
+          <ExpenseForm onSubmit={handleAddExpense} />
+          
+          <ExpenseList 
+            expenses={expenses} 
+            onDeleteExpense={handleDeleteExpense} 
+          />
+        </main>
+
+        <div className="mt-8 text-center">
+          <Link href="/" className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-2">
+            <span>←</span>
+            <span>Back to Home</span>
+          </Link>
+        </div>
       </div>
     </div>
-  )
+  );
 }
